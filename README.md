@@ -45,7 +45,7 @@ Aplikasi kasir untuk toko Coffee Bean yang membantu dalam pengelolaan produk, pe
    ```
 2. Masuk ke direktori backend:
    ```bash
-   cd uasppm
+   cd coffee-bean
    ```
 3. Install dependencies:
    ```bash
