@@ -6,9 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconly/iconly.dart';
-import 'package:uas/pages/add/AddProduct.dart';
-import 'package:uas/pages/add/AddSeller.dart';
-import 'package:uas/pages/add/AddStock.dart';
+import 'package:uas/pages/add/add_product.dart';
+import 'package:uas/pages/add/add_payment.dart';
 
 import '../pages/pages.dart';
 
@@ -35,11 +34,9 @@ class _MainWrapperState extends State<MainWrapper> {
   }
 
   /// Top Level Pages
-  final List<Widget> topLevelPages = const [
-    HomePage(),
+  final List<Widget> topLevelPages = [
     ProductPage(),
-    NotificationsPage(),
-    SellerPage(),
+    PaymentPage(),
   ];
 
   /// on Page Changed
@@ -81,14 +78,14 @@ class _MainWrapperState extends State<MainWrapper> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Baelz Project",
+                    "Coffee Bean",
                     style: TextStyle(
                         fontSize: 26,
                         fontWeight: FontWeight.bold,
                         color: Colors.black),
                   ),
                   Text(
-                    "Mobile Developer",
+                    "Tempat Kopi Santuy",
                     style: TextStyle(fontSize: 16, color: Colors.black),
                   ),
                 ],
@@ -130,7 +127,7 @@ class _MainWrapperState extends State<MainWrapper> {
                         _launchInBrowser(Uri(
                             scheme: 'https',
                             host: 'github.com',
-                            path: 'miqbalfr12/Baelz-Project-Mobile-1'));
+                            path: 'miqbalfr12/uasppm'));
                       }),
                     ),
                   )
@@ -165,15 +162,8 @@ class _MainWrapperState extends State<MainWrapper> {
               children: [
                 _bottomAppBarItem(
                   context,
-                  defaultIcon: IconlyLight.home,
-                  page: 0,
-                  label: "Home",
-                  filledIcon: IconlyBold.home,
-                ),
-                _bottomAppBarItem(
-                  context,
                   defaultIcon: IconlyLight.bag,
-                  page: 1,
+                  page: 0,
                   label: "Product",
                   filledIcon: IconlyBold.bag,
                 ),
@@ -183,17 +173,10 @@ class _MainWrapperState extends State<MainWrapper> {
                 ),
                 _bottomAppBarItem(
                   context,
-                  defaultIcon: IconlyLight.document,
-                  page: 2,
-                  label: "Stocks",
-                  filledIcon: IconlyBold.document,
-                ),
-                _bottomAppBarItem(
-                  context,
-                  defaultIcon: IconlyLight.user_1,
-                  page: 3,
-                  label: "Seller",
-                  filledIcon: IconlyBold.user_3,
+                  defaultIcon: IconlyLight.wallet,
+                  page: 1,
+                  label: "Payment",
+                  filledIcon: IconlyBold.wallet,
                 ),
               ],
             ),
@@ -218,6 +201,18 @@ class _MainWrapperState extends State<MainWrapper> {
             onTap: () {
               Navigator.push(
                 context,
+                MaterialPageRoute(builder: (context) => const AddPayment()),
+              );
+            },
+            shape: const CircleBorder(),
+            child: const Icon(Icons.add, color: Colors.amber),
+            labelWidget:
+                const Text("Order", style: TextStyle(color: Colors.white))),
+        SpeedDialChild(
+            backgroundColor: Colors.grey.shade800,
+            onTap: () {
+              Navigator.push(
+                context,
                 MaterialPageRoute(builder: (context) => const AddProduct()),
               );
             },
@@ -225,30 +220,6 @@ class _MainWrapperState extends State<MainWrapper> {
             child: const Icon(Icons.add, color: Colors.amber),
             labelWidget:
                 const Text("Product", style: TextStyle(color: Colors.white))),
-        SpeedDialChild(
-            backgroundColor: Colors.grey.shade800,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AddStock()),
-              );
-            },
-            shape: const CircleBorder(),
-            child: const Icon(Icons.add, color: Colors.amber),
-            labelWidget:
-                const Text("Stock", style: TextStyle(color: Colors.white))),
-        SpeedDialChild(
-            backgroundColor: Colors.grey.shade800,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const AddSeller()),
-              );
-            },
-            shape: const CircleBorder(),
-            child: const Icon(Icons.add, color: Colors.amber),
-            labelWidget:
-                const Text("Seller", style: TextStyle(color: Colors.white))),
       ],
       child: const Icon(Icons.add),
     );
