@@ -41,7 +41,7 @@ Aplikasi kasir untuk toko Coffee Bean yang membantu dalam pengelolaan produk, pe
 
 1. Clone repository ini:
    ```bash
-   git clone https://github.com/miqbalfr12/uasppm.git
+   git clone https://github.com/miqbalfr12/coffee-bean.git
    ```
 2. Masuk ke direktori backend:
    ```bash
@@ -79,7 +79,7 @@ Aplikasi kasir untuk toko Coffee Bean yang membantu dalam pengelolaan produk, pe
 
 ## Release Aplikasi
 
-Versi saat ini dari aplikasi dapat ditemukan di [releases](https://github.com/miqbalfr12/uasppm/releases). Silakan kunjungi halaman releases untuk mengunduh versi terbaru dari aplikasi.
+Versi saat ini dari aplikasi dapat ditemukan di [releases](https://github.com/miqbalfr12/coffee-bean/releases). Silakan kunjungi halaman releases untuk mengunduh versi terbaru dari aplikasi.
 
 ## Screenshot
 
