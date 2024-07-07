@@ -7,6 +7,7 @@ class Payment {
   final int createdAt;
   final int editedAt;
   final String consumer;
+  final String createdBy;
   final List<Order> order;
 
   Payment(
@@ -16,6 +17,7 @@ class Payment {
       required this.createdAt,
       required this.editedAt,
       required this.order,
+      required this.createdBy,
       required this.consumer});
 
   factory Payment.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class Payment {
       total: json['total'],
       createdAt: json['createdAt'],
       editedAt: json['editedAt'],
+      createdBy: json['createdBy'],
       order: orderList,
       consumer: json['consumer'],
     );
