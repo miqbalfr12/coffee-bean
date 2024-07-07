@@ -1,14 +1,15 @@
 class Order {
   final String id;
   final String product;
-  final int qty;
+  int qty;
   final int price;
 
-  Order(
-      {required this.id,
-      required this.product,
-      required this.qty,
-      required this.price});
+  Order({
+    required this.id,
+    required this.product,
+    required this.qty,
+    required this.price,
+  });
 
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
@@ -17,5 +18,14 @@ class Order {
       qty: json['qty'],
       price: json['price'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'product': product,
+      'qty': qty,
+      'price': price,
+    };
   }
 }
