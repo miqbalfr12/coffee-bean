@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconly/iconly.dart';
 import 'package:intl/intl.dart';
-import 'package:uas/modal/modal_content.dart';
 import 'package:uas/models/order.dart';
 import 'package:uas/models/payment.dart';
 import 'package:uas/services/api_service.dart';
