@@ -1,18 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:uas/modal/ModalContent.dart';
+import 'package:uas/modal/modal_content_qr.dart';
+import 'package:uas/globals/globals.dart' as globals;
 
-class AddProduct extends StatefulWidget {
-  const AddProduct({super.key});
+class AddPayment extends StatefulWidget {
+  const AddPayment({super.key});
 
   @override
-  AddProductState createState() => AddProductState();
+  AddPaymentState createState() => AddPaymentState();
 }
 
-class AddProductState extends State<AddProduct> {
+class AddPaymentState extends State<AddPayment> {
   final _formKey = GlobalKey<FormState>();
-  String _itemName = "";
-  int _quantity = 0;
-  String _attr = "";
+  String _consumer = "";
+  String _createdBy = "";
+  int _amount = 0;
+  final TextEditingController _amountController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _amount = calculateTotalAmount();
+    _amountController.text = _amount.toString();
+  }
+
+  int calculateTotalAmount() {
+    int total = 0;
+    for (var order in globals.orders) {
+      total += order.price * order.qty;
+    }
+    return total;
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +43,7 @@ class AddProductState extends State<AddProduct> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: Colors.amber,
-        title: const Text('Tambah Product'),
+        title: const Text('Tambah Order'),
       ),
       backgroundColor: Colors.amber, // Background color of the main Scaffold
       body: Stack(
@@ -36,7 +59,7 @@ class AddProductState extends State<AddProduct> {
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: formAddProduct(),
+              child: formAddPayment(),
             ),
           ),
           Positioned(
@@ -53,18 +76,20 @@ class AddProductState extends State<AddProduct> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         _formKey.currentState!.save();
-                        // Handle form submission with _itemName and _quantity
-                        // You can potentially call a function to add stock
                         print(
-                            "Adding Product for $_itemName with quantity $_quantity and attribute $_attr");
+                            "Adding Order for $_consumer with amount $_amount and createdBy $_createdBy");
+                        // Cetak variabel global orders
+                        print("Current global orders: ${globals.orders}");
+
                         showModalBottomSheet(
                           context: context,
                           backgroundColor: Colors.amber,
                           builder: (BuildContext context) {
-                            return ModalContent(title: 'Add Product', obj: {
-                              "itemName": _itemName,
-                              "quantity": _quantity,
-                              "attr": _attr
+                            return ModalContent(title: 'Tambah Order', obj: {
+                              "consumer": _consumer,
+                              "amount": _amount,
+                              "createdBy": _createdBy,
+                              "order": globals.orders,
                             });
                           },
                         );
@@ -118,7 +143,7 @@ class AddProductState extends State<AddProduct> {
     );
   }
 
-  Form formAddProduct() {
+  Form formAddPayment() {
     return Form(
       key: _formKey,
       child: Column(
@@ -128,9 +153,9 @@ class AddProductState extends State<AddProduct> {
             keyboardType: TextInputType.text,
             cursorColor: Colors.amber,
             decoration: InputDecoration(
-              labelText: "Nama Barang",
+              labelText: "Nama Kasir",
               prefixIcon: const Icon(
-                Icons.inventory, // Change to your desired icon
+                Icons.assignment_ind_rounded, // Change to your desired icon
               ),
               focusColor: Colors.amber,
               prefixIconColor: Colors.grey.shade700,
@@ -152,47 +177,11 @@ class AddProductState extends State<AddProduct> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return "Nama barang tidak boleh kosong";
+                return "Nama Kasir tidak boleh kosong";
               }
               return null;
             },
-            onSaved: (value) => _itemName = value!,
-          ),
-          const SizedBox(height: 10),
-          TextFormField(
-            style: TextStyle(color: Colors.grey.shade700),
-            keyboardType: TextInputType.number,
-            cursorColor: Colors.amber,
-            decoration: InputDecoration(
-              labelText: "Jumlah Stock",
-              prefixIcon: const Icon(
-                Icons.calculate, // Change to your desired icon
-              ),
-              focusColor: Colors.amber,
-              prefixIconColor: Colors.grey.shade700,
-              floatingLabelStyle: const TextStyle(
-                color: Colors.amber,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(100.0),
-                borderSide: const BorderSide(
-                  color: Colors.amber, // Set border color
-                ),
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(100.0), // Set border radius
-                borderSide: const BorderSide(
-                  color: Colors.amber, // Set border color
-                ),
-              ),
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return "Jumlah Stock tidak boleh kosong";
-              }
-              return null;
-            },
-            onSaved: (value) => _quantity = int.parse(value!),
+            onSaved: (value) => _createdBy = value!,
           ),
           const SizedBox(height: 10),
           TextFormField(
@@ -200,9 +189,9 @@ class AddProductState extends State<AddProduct> {
             keyboardType: TextInputType.text,
             cursorColor: Colors.amber,
             decoration: InputDecoration(
-              labelText: "Atribut Jumlah Stock",
+              labelText: "Nama Pemesan",
               prefixIcon: const Icon(
-                Icons.scale, // Change to your desired icon
+                Icons.person, // Change to your desired icon
               ),
               focusColor: Colors.amber,
               prefixIconColor: Colors.grey.shade700,
@@ -224,11 +213,48 @@ class AddProductState extends State<AddProduct> {
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return "Atribut Jumlah Stock tidak boleh kosong";
+                return "Nama Pemesan tidak boleh kosong";
               }
               return null;
             },
-            onSaved: (value) => _attr = value!,
+            onSaved: (value) => _consumer = value!,
+          ),
+          const SizedBox(height: 10),
+          TextFormField(
+            style: TextStyle(color: Colors.grey.shade700),
+            keyboardType: TextInputType.number,
+            cursorColor: Colors.amber,
+            controller: _amountController,
+            decoration: InputDecoration(
+              labelText: "Harga Total Barang",
+              prefixIcon: const Icon(
+                Icons.monetization_on, // Change to your desired icon
+              ),
+              focusColor: Colors.amber,
+              prefixIconColor: Colors.grey.shade700,
+              floatingLabelStyle: const TextStyle(
+                color: Colors.amber,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(100.0),
+                borderSide: const BorderSide(
+                  color: Colors.amber, // Set border color
+                ),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(100.0), // Set border radius
+                borderSide: const BorderSide(
+                  color: Colors.amber, // Set border color
+                ),
+              ),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "Harga Total Barang tidak boleh kosong";
+              }
+              return null;
+            },
+            onSaved: (value) => _amount = int.parse(value!),
           ),
         ],
       ),
