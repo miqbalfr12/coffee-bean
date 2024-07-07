@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:uas/services/api_service.dart';
+
+import 'package:uas/globals/globals.dart' as globals;
 
 class ModalContent extends StatefulWidget {
   const ModalContent({super.key, required this.title, this.obj = const {}});
@@ -18,6 +21,7 @@ class _ModalContentState extends State<ModalContent> {
   bool isSuccess = false;
   var idQr = "";
   var qrUrl = "";
+  Timer? _timer;
 
   @override
   void initState() {
@@ -25,7 +29,14 @@ class _ModalContentState extends State<ModalContent> {
     _fetchData();
   }
 
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
   Future<void> _fetchData() async {
+    final ApiService apiService = ApiService();
     String title = widget.title;
     Map<String, dynamic> obj = widget.obj;
     print('Title: $title');
@@ -33,43 +44,64 @@ class _ModalContentState extends State<ModalContent> {
 
     await Future.delayed(const Duration(seconds: 2));
 
-    if (mounted) {
-      try {
-        final ApiService apiService = ApiService();
-        var response = await apiService.createPayment(
-            obj['amount'], obj['consumer'], obj['createdBy'], obj['order']);
-        if (response.statusCode == 200) {
-          var jsonResponse = jsonDecode(response.body);
-          idQr = jsonResponse['message']['id'];
-          var urlPay = 'https://apiuasppm.vercel.app/$idQr';
-          print('jsonResponse: $urlPay');
-          setState(() {
-            qrUrl = urlPay;
-            // isSuccess = true;
-            isLoading = false;
-          });
-        } else {
-          print('Failed: ${response.statusCode}');
+    if (title == 'Tambah Order') {
+      if (mounted) {
+        try {
+          var response = await apiService.createPayment(
+              obj['amount'], obj['consumer'], obj['createdBy'], obj['order']);
+          print('response.statusCode: ${response.statusCode}');
+          if (response.statusCode == 200) {
+            var jsonResponse = jsonDecode(response.body);
+            print(jsonResponse['message']);
+            idQr = jsonResponse['message']['id'];
+            var urlPay = 'https://coffeebean.reidteam.web.id/$idQr';
+            print('jsonResponse: $urlPay');
+            setState(() {
+              qrUrl = urlPay;
+              // isSuccess = true;
+              isLoading = false;
+            });
+            _startPolling();
+          } else {
+            print('Failed: ${response.statusCode}');
+            setState(() {
+              isSuccess = false;
+              isLoading = false;
+            });
+          }
+        } catch (e) {
+          print('Error: $e');
           setState(() {
             isSuccess = false;
             isLoading = false;
           });
         }
-      } catch (e) {
-        print('Error: $e');
+      }
+    } else {
+      if (mounted) {
         setState(() {
-          isSuccess = false;
+          idQr = obj['idQr'];
+          var urlPay = 'https://coffeebean.reidteam.web.id/$idQr';
+          qrUrl = urlPay;
+          // isSuccess = true;
           isLoading = false;
         });
+        _startPolling();
       }
     }
   }
 
+  void _startPolling() {
+    _timer = Timer.periodic(Duration(seconds: 5), (timer) async {
+      await _refreshData();
+    });
+  }
+
   Future<void> _refreshData() async {
-    print('https://apiuasppm.vercel.app/api/payment/$idQr');
+    print('https://coffeebean.reidteam.web.id/api/payment/$idQr');
     try {
       var response = await http.get(
-        Uri.parse('https://apiuasppm.vercel.app/api/payment/$idQr'),
+        Uri.parse('https://coffeebean.reidteam.web.id/api/payment/$idQr'),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -90,6 +122,7 @@ class _ModalContentState extends State<ModalContent> {
             qrUrl = "";
             isSuccess = true;
           });
+          _timer?.cancel();
         }
       } else {
         print('Failed: ${response.statusCode}');
@@ -142,23 +175,11 @@ class _ModalContentState extends State<ModalContent> {
                                     backgroundColor: Colors.black,
                                   ),
                                   onPressed: () {
-                                    _refreshData();
-                                  },
-                                  child: const Text(
-                                    'Refresh',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.black,
-                                  ),
-                                  onPressed: () {
+                                    globals.orders.clear();
                                     Navigator.pop(context);
-                                    Navigator.pop(context);
+                                    if (widget.title == 'Tambah Order') {
+                                      Navigator.pop(context);
+                                    }
                                   },
                                   child: const Text(
                                     'Close',
@@ -173,8 +194,11 @@ class _ModalContentState extends State<ModalContent> {
                               backgroundColor: Colors.black,
                             ),
                             onPressed: () {
+                              globals.orders.clear();
                               Navigator.pop(context);
-                              Navigator.pop(context);
+                              if (widget.title == 'Tambah Order') {
+                                Navigator.pop(context);
+                              }
                             },
                             child: const Text(
                               'Close',
